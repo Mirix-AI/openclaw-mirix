@@ -1,0 +1,38 @@
+{
+  "name": "@mirix-ai/openclaw-mirix",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin for Mirix-backed memory recall and capture.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": [
+    "src",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "memory",
+    "mirix",
+    "openclaw-plugin"
+  ],
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}

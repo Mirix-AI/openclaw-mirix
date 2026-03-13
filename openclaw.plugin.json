@@ -1,0 +1,141 @@
+{
+  "id": "mirix-memory",
+  "name": "Mirix Memory",
+  "description": "Connects OpenClaw to the Mirix hosted memory backend.",
+  "version": "0.1.0",
+  "kind": "memory",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "default": "https://api.mirix.io"
+      },
+      "apiKey": {
+        "type": "string"
+      },
+      "provider": {
+        "type": "string",
+        "default": "openai"
+      },
+      "providerApiKey": {
+        "type": "string"
+      },
+      "model": {
+        "type": "string"
+      },
+      "autoInitialize": {
+        "type": "boolean",
+        "default": true
+      },
+      "autoRecall": {
+        "type": "boolean",
+        "default": true
+      },
+      "autoCapture": {
+        "type": "boolean",
+        "default": true
+      },
+      "recallLimit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 20,
+        "default": 6
+      },
+      "searchMethod": {
+        "type": "string",
+        "enum": [
+          "bm25",
+          "embedding"
+        ],
+        "default": "embedding"
+      },
+      "searchToolName": {
+        "type": "string",
+        "enum": [
+          "search_mirix_memory",
+          "search_memory"
+        ],
+        "default": "search_mirix_memory"
+      },
+      "userIdMode": {
+        "type": "string",
+        "enum": [
+          "session",
+          "agent",
+          "fixed"
+        ],
+        "default": "session"
+      },
+      "fixedUserId": {
+        "type": "string"
+      },
+      "userIdPrefix": {
+        "type": "string",
+        "default": "openclaw"
+      },
+      "filterTags": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "debug": {
+        "type": "boolean",
+        "default": false
+      }
+    }
+  },
+  "uiHints": {
+    "baseUrl": {
+      "label": "Mirix API URL",
+      "placeholder": "https://api.mirix.io"
+    },
+    "apiKey": {
+      "label": "Mirix API Key",
+      "sensitive": true
+    },
+    "provider": {
+      "label": "Meta Agent Provider"
+    },
+    "providerApiKey": {
+      "label": "Provider API Key",
+      "sensitive": true
+    },
+    "model": {
+      "label": "Provider Model"
+    },
+    "autoInitialize": {
+      "label": "Auto Initialize"
+    },
+    "autoRecall": {
+      "label": "Auto Recall"
+    },
+    "autoCapture": {
+      "label": "Auto Capture"
+    },
+    "recallLimit": {
+      "label": "Recall Limit"
+    },
+    "searchMethod": {
+      "label": "Search Method"
+    },
+    "searchToolName": {
+      "label": "Search Tool Name"
+    },
+    "userIdMode": {
+      "label": "User ID Mode"
+    },
+    "fixedUserId": {
+      "label": "Fixed User ID"
+    },
+    "userIdPrefix": {
+      "label": "User ID Prefix"
+    },
+    "filterTags": {
+      "label": "Default Filter Tags"
+    },
+    "debug": {
+      "label": "Debug Logging"
+    }
+  }
+}
