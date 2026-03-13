@@ -52,6 +52,17 @@ function textResult(text: string) {
   return { content: [{ type: "text", text }] };
 }
 
+async function promptIfMissing(
+  rl: readline.Interface,
+  value: string | undefined,
+  prompt: string,
+): Promise<string> {
+  if (value && value.trim()) {
+    return value.trim();
+  }
+  return (await rl.question(prompt)).trim();
+}
+
 function getOpenClawConfigPath(): string {
   return path.join(os.homedir(), ".openclaw", "openclaw.json");
 }
@@ -77,7 +88,14 @@ async function writeOpenClawConfig(config: any): Promise<string> {
   return configPath;
 }
 
-async function setupMirixConfig(api: RegisterApi): Promise<{
+async function setupMirixConfig(
+  api: RegisterApi,
+  options: {
+    apiKey?: string;
+    baseUrl?: string;
+    searchToolName?: string;
+  } = {},
+): Promise<{
   configPath: string;
   searchToolName: "search_memory" | "search_mirix_memory";
 }> {
@@ -85,36 +103,30 @@ async function setupMirixConfig(api: RegisterApi): Promise<{
   const rl = readline.createInterface({ input, output });
 
   try {
-    const apiKey = (await rl.question("Mirix API key: ")).trim();
+    const apiKey = await promptIfMissing(rl, options.apiKey, "Mirix API key: ");
     if (!apiKey) {
       throw new Error("Mirix API key is required.");
     }
 
-    const baseUrl = (
-      await rl.question(`Mirix API URL [${current.baseUrl || "https://api.mirix.io"}]: `)
-    ).trim();
+    const baseUrl = await promptIfMissing(
+      rl,
+      options.baseUrl,
+      `Mirix API URL [${current.baseUrl || "https://api.mirix.io"}]: `,
+    );
 
-    const searchToolInput = (
-      await rl.question(
-        `Detailed search tool name [${current.searchToolName || "search_mirix_memory"}]: `,
-      )
-    ).trim();
+    const searchToolInput = await promptIfMissing(
+      rl,
+      options.searchToolName,
+      `Detailed search tool name [${current.searchToolName || "search_mirix_memory"}]: `,
+    );
 
     const searchToolName =
       searchToolInput === "search_memory" ? "search_memory" : "search_mirix_memory";
 
     const config = await readOpenClawConfig();
     const plugins = (config.plugins ??= {});
-    const load = (plugins.load ??= {});
     const slots = (plugins.slots ??= {});
     const entries = (plugins.entries ??= {});
-
-    const pluginPath = process.cwd();
-    const loadPaths = Array.isArray(load.paths) ? load.paths : [];
-    if (!loadPaths.includes(pluginPath)) {
-      loadPaths.push(pluginPath);
-    }
-    load.paths = loadPaths;
 
     slots.memory = "mirix-memory";
     entries["mirix-memory"] = {
@@ -201,9 +213,15 @@ export default {
         mirix
           .command("setup")
           .description("Prompt for the Mirix API key and write OpenClaw config")
-          .action(async () => {
+          .option("--api-key <apiKey>", "Mirix API key")
+          .option("--base-url <baseUrl>", "Mirix API URL")
+          .option(
+            "--search-tool-name <searchToolName>",
+            "Detailed search tool name: search_mirix_memory or search_memory",
+          )
+          .action(async (options: any) => {
             try {
-              const result = await setupMirixConfig(api);
+              const result = await setupMirixConfig(api, options);
               console.log(`Mirix config saved to ${result.configPath}`);
               console.log(`Detailed search tool: ${result.searchToolName}`);
               console.log("Restart the OpenClaw gateway to load the updated config.");

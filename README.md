@@ -49,6 +49,12 @@ openclaw mirix setup
 
 The `setup` command prompts for the Mirix API key and writes the plugin config into `~/.openclaw/openclaw.json`.
 
+It also supports non-interactive flags:
+
+```bash
+openclaw mirix setup --api-key YOUR_MIRIX_API_KEY --search-tool-name search_mirix_memory
+```
+
 3. If you want it listed on the OpenClaw community plugins page, add:
 
 - a public GitHub repo for this package

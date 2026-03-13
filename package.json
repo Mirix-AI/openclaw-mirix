@@ -1,6 +1,6 @@
 {
   "name": "@mirix-ai/openclaw-mirix",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenClaw plugin for Mirix-backed memory recall and capture.",
   "license": "UNLICENSED",
   "type": "module",
