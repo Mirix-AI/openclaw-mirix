@@ -64,6 +64,10 @@ async function promptIfMissing(
   return (await rl.question(prompt)).trim();
 }
 
+function pickConfiguredOrDefault(value: string | undefined, fallback: string): string {
+  return value && value.trim() ? value.trim() : fallback;
+}
+
 function getOpenClawConfigPath(): string {
   return path.join(os.homedir(), ".openclaw", "openclaw.json");
 }
@@ -195,16 +199,14 @@ async function setupMirixConfig(
       throw new Error("Mirix API key is required.");
     }
 
-    const baseUrl = await promptIfMissing(
-      rl,
+    const baseUrl = pickConfiguredOrDefault(
       options.baseUrl,
-      `Mirix API URL [${current.baseUrl || "https://api.mirix.io"}]: `,
+      current.baseUrl || "https://api.mirix.io",
     );
 
-    const searchToolInput = await promptIfMissing(
-      rl,
+    const searchToolInput = pickConfiguredOrDefault(
       options.searchToolName,
-      `Detailed search tool name [${current.searchToolName || "search_mirix_memory"}]: `,
+      current.searchToolName || "search_mirix_memory",
     );
 
     const searchToolName =

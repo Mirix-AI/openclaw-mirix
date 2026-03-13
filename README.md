@@ -47,6 +47,8 @@ openclaw plugins install @mirix-ai/openclaw-mirix
 openclaw mirix setup
 ```
 
+`openclaw mirix setup` only prompts for the Mirix API key. It uses the default API URL `https://api.mirix.io` and the default detailed search tool name `search_mirix_memory` unless you override them with CLI flags.
+
 The `setup` command prompts for the Mirix API key and writes the plugin config into `~/.openclaw/openclaw.json`.
 
 It also supports non-interactive flags:
