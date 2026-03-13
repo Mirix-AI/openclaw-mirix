@@ -103,7 +103,7 @@ function scheduleOpenClawConfigWrite(configPatch: {
   userIdPrefix: string;
 }) {
   const encodedPatch = Buffer.from(JSON.stringify(configPatch), "utf8").toString("base64");
-  const script = `
+const script = `
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
@@ -113,7 +113,38 @@ const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
 const configDir = path.dirname(configPath);
 const tempPath = path.join(configDir, "openclaw.json.tmp");
 
-setTimeout(() => {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function waitForStableConfig() {
+  let lastMtime = -1;
+  let stableRounds = 0;
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    let mtime = -1;
+    try {
+      mtime = fs.statSync(configPath).mtimeMs;
+    } catch (_) {
+      mtime = -1;
+    }
+
+    if (mtime === lastMtime) {
+      stableRounds += 1;
+    } else {
+      stableRounds = 0;
+      lastMtime = mtime;
+    }
+
+    if (stableRounds >= 3) {
+      return;
+    }
+
+    await sleep(1000);
+  }
+}
+
+(async () => {
+  await waitForStableConfig();
+
   let config = {};
   try {
     config = JSON.parse(fs.readFileSync(configPath, "utf8"));
@@ -134,7 +165,7 @@ setTimeout(() => {
   fs.mkdirSync(configDir, { recursive: true });
   fs.writeFileSync(tempPath, JSON.stringify(config, null, 2) + "\\n", "utf8");
   fs.renameSync(tempPath, configPath);
-}, 3000);
+})().catch(() => {});
 `;
 
   const child = spawn(process.execPath, ["-e", script, encodedPatch], {
