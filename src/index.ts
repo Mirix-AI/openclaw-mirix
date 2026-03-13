@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox";
+import { spawn } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -88,6 +89,61 @@ async function writeOpenClawConfig(config: any): Promise<string> {
   return configPath;
 }
 
+function scheduleOpenClawConfigWrite(configPatch: {
+  apiKey: string;
+  baseUrl: string;
+  provider: string;
+  autoInitialize: boolean;
+  autoRecall: boolean;
+  autoCapture: boolean;
+  recallLimit: number;
+  searchMethod: string;
+  searchToolName: "search_memory" | "search_mirix_memory";
+  userIdMode: string;
+  userIdPrefix: string;
+}) {
+  const encodedPatch = Buffer.from(JSON.stringify(configPatch), "utf8").toString("base64");
+  const script = `
+const fs = require("node:fs");
+const path = require("node:path");
+const os = require("node:os");
+
+const patch = JSON.parse(Buffer.from(process.argv[1], "base64").toString("utf8"));
+const configPath = path.join(os.homedir(), ".openclaw", "openclaw.json");
+const configDir = path.dirname(configPath);
+const tempPath = path.join(configDir, "openclaw.json.tmp");
+
+setTimeout(() => {
+  let config = {};
+  try {
+    config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch (_) {
+    config = {};
+  }
+
+  const plugins = config.plugins || (config.plugins = {});
+  const slots = plugins.slots || (plugins.slots = {});
+  const entries = plugins.entries || (plugins.entries = {});
+
+  slots.memory = "mirix-memory";
+  entries["mirix-memory"] = {
+    enabled: true,
+    config: patch,
+  };
+
+  fs.mkdirSync(configDir, { recursive: true });
+  fs.writeFileSync(tempPath, JSON.stringify(config, null, 2) + "\\n", "utf8");
+  fs.renameSync(tempPath, configPath);
+}, 500);
+`;
+
+  const child = spawn(process.execPath, ["-e", script, encodedPatch], {
+    detached: true,
+    stdio: "ignore",
+  });
+  child.unref();
+}
+
 async function setupMirixConfig(
   api: RegisterApi,
   options: {
@@ -123,30 +179,23 @@ async function setupMirixConfig(
     const searchToolName =
       searchToolInput === "search_memory" ? "search_memory" : "search_mirix_memory";
 
-    const config = await readOpenClawConfig();
-    const plugins = (config.plugins ??= {});
-    const slots = (plugins.slots ??= {});
-    const entries = (plugins.entries ??= {});
-
-    slots.memory = "mirix-memory";
-    entries["mirix-memory"] = {
-      enabled: true,
-      config: {
-        apiKey,
-        baseUrl: baseUrl || current.baseUrl || "https://api.mirix.io",
-        provider: current.provider || "openai",
-        autoInitialize: current.autoInitialize !== false,
-        autoRecall: current.autoRecall !== false,
-        autoCapture: current.autoCapture !== false,
-        recallLimit: current.recallLimit || 6,
-        searchMethod: current.searchMethod || "embedding",
-        searchToolName,
-        userIdMode: current.userIdMode || "session",
-        userIdPrefix: current.userIdPrefix || "openclaw",
-      },
+    const configPatch: Parameters<typeof scheduleOpenClawConfigWrite>[0] = {
+      apiKey,
+      baseUrl: baseUrl || current.baseUrl || "https://api.mirix.io",
+      provider: current.provider || "openai",
+      autoInitialize: current.autoInitialize !== false,
+      autoRecall: current.autoRecall !== false,
+      autoCapture: current.autoCapture !== false,
+      recallLimit: current.recallLimit || 6,
+      searchMethod: current.searchMethod || "embedding",
+      searchToolName,
+      userIdMode: current.userIdMode || "session",
+      userIdPrefix: current.userIdPrefix || "openclaw",
     };
 
-    const configPath = await writeOpenClawConfig(config);
+    scheduleOpenClawConfigWrite(configPatch);
+
+    const configPath = getOpenClawConfigPath();
     return { configPath, searchToolName };
   } finally {
     rl.close();
