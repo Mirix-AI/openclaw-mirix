@@ -134,7 +134,7 @@ setTimeout(() => {
   fs.mkdirSync(configDir, { recursive: true });
   fs.writeFileSync(tempPath, JSON.stringify(config, null, 2) + "\\n", "utf8");
   fs.renameSync(tempPath, configPath);
-}, 500);
+}, 3000);
 `;
 
   const child = spawn(process.execPath, ["-e", script, encodedPatch], {
