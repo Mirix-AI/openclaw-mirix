@@ -469,7 +469,5 @@ export default {
         log(api, "warn", "[openclaw-mirix] capture failed", client.explainError(error));
       }
     });
-
-    log(api, "info", "[openclaw-mirix] plugin registered");
   },
 };
