@@ -38,7 +38,7 @@ type RegisterApi = {
 };
 
 function getPluginConfig(api: RegisterApi) {
-  return api.config?.plugins?.entries?.["mirix-memory"]?.config || {};
+  return api.config?.plugins?.entries?.["openclaw-mirix"]?.config || {};
 }
 
 function getClient(api: RegisterApi) {
@@ -156,8 +156,8 @@ async function waitForStableConfig() {
   const slots = plugins.slots || (plugins.slots = {});
   const entries = plugins.entries || (plugins.entries = {});
 
-  slots.memory = "mirix-memory";
-  entries["mirix-memory"] = {
+  slots.memory = "openclaw-mirix";
+  entries["openclaw-mirix"] = {
     enabled: true,
     config: patch,
   };
@@ -269,8 +269,8 @@ async function runDetailedSearch(api: RegisterApi, runtime: any, params: any) {
 }
 
 export default {
-  id: "mirix-memory",
-  name: "Mirix Memory",
+  id: "openclaw-mirix",
+  name: "OpenClaw Mirix",
   register(api: RegisterApi) {
     api.registerGatewayMethod?.("mirix.status", async ({ respond }: any) => {
       const client = getClient(api);
@@ -444,7 +444,7 @@ export default {
           systemPrompt: `${event.systemPrompt || ""}\n\n[Mirix memory context]\nUse the following retrieved memories when relevant.\n${memoryContext}`,
         };
       } catch (error) {
-        log(api, "warn", "[mirix-memory] recall failed", client.explainError(error));
+        log(api, "warn", "[openclaw-mirix] recall failed", client.explainError(error));
         return;
       }
     });
@@ -466,10 +466,10 @@ export default {
           rawInput: rawMessages,
         });
       } catch (error) {
-        log(api, "warn", "[mirix-memory] capture failed", client.explainError(error));
+        log(api, "warn", "[openclaw-mirix] capture failed", client.explainError(error));
       }
     });
 
-    log(api, "info", "[mirix-memory] plugin registered");
+    log(api, "info", "[openclaw-mirix] plugin registered");
   },
 };

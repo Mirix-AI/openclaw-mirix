@@ -255,7 +255,7 @@ export class MirixRemoteClient {
 
   async request(path: string, options: RequestOptions = {}): Promise<any> {
     if (!this.config.apiKey) {
-      throw new Error("Mirix API key is missing. Set plugins.entries.mirix-memory.config.apiKey.");
+      throw new Error("Mirix API key is missing. Set plugins.entries.openclaw-mirix.config.apiKey.");
     }
 
     const method = options.method || "GET";

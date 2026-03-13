@@ -1,4 +1,4 @@
-# Mirix Memory Plugin for OpenClaw
+# OpenClaw Mirix Plugin
 
 This package connects OpenClaw to the Mirix hosted memory backend and mirrors the core Python SDK flow:
 
@@ -43,7 +43,7 @@ npm publish --access public
 2. Users can then install it with:
 
 ```bash
-openclaw plugins install @mirix-ai/mirix-memory
+openclaw plugins install @mirix-ai/openclaw-mirix
 openclaw mirix setup
 ```
 
@@ -70,10 +70,10 @@ Add this to your OpenClaw config:
 {
   "plugins": {
     "slots": {
-      "memory": "mirix-memory"
+      "memory": "openclaw-mirix"
     },
     "entries": {
-      "mirix-memory": {
+      "openclaw-mirix": {
         "enabled": true,
         "config": {
           "apiKey": "your_mirix_api_key",

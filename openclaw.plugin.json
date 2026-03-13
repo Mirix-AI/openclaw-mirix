@@ -1,8 +1,8 @@
 {
-  "id": "mirix-memory",
-  "name": "Mirix Memory",
+  "id": "openclaw-mirix",
+  "name": "OpenClaw Mirix",
   "description": "Connects OpenClaw to the Mirix hosted memory backend.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "kind": "memory",
   "configSchema": {
     "type": "object",
