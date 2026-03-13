@@ -43,7 +43,7 @@ npm publish --access public
 2. Users can then install it with:
 
 ```bash
-openclaw plugins install @mirix-ai/openclaw-mirix
+openclaw plugins install @mirix-ai/mirix-memory
 openclaw mirix setup
 ```
 
