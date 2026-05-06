@@ -116,25 +116,25 @@ export function extractPromptText(event: { prompt?: unknown; messages?: unknown[
 export function deriveUserId(config: MirixPluginConfig, ctx: ContextLike): string {
   const prefix = config.userIdPrefix || "openclaw";
   const agentId = ctx.agentId || "main";
-  const sessionKey =
-    ctx.sessionKey ||
-    ctx.session?.sessionKey ||
-    ctx.session?.key ||
-    ctx.sessionManager?.getCurrentSessionKey?.() ||
-    ctx.sessionId ||
-    ctx.session?.sessionId ||
-    ctx.sessionManager?.getSessionFile?.() ||
-    "main";
 
   if (config.userIdMode === "fixed" && config.fixedUserId) {
     return config.fixedUserId;
   }
 
-  if (config.userIdMode === "agent") {
-    return `${prefix}:${agentId}`;
+  if (config.userIdMode === "session") {
+    const sessionKey =
+      ctx.sessionKey ||
+      ctx.session?.sessionKey ||
+      ctx.session?.key ||
+      ctx.sessionManager?.getCurrentSessionKey?.() ||
+      ctx.sessionId ||
+      ctx.session?.sessionId ||
+      ctx.sessionManager?.getSessionFile?.() ||
+      "main";
+    return `${prefix}:${agentId}:${sessionKey}`;
   }
 
-  return `${prefix}:${agentId}:${sessionKey}`;
+  return `${prefix}:${agentId}`;
 }
 
 export function toMirixMessages(messages: Array<{ role?: unknown; content?: unknown }>): MirixMessage[] {
@@ -248,7 +248,7 @@ export class MirixRemoteClient {
       autoRecall: this.config.autoRecall !== false,
       autoCapture: this.config.autoCapture !== false,
       recallLimit: this.config.recallLimit || 6,
-      userIdMode: this.config.userIdMode || "session",
+      userIdMode: this.config.userIdMode || "agent",
       searchToolName: this.config.searchToolName || "search_mirix_memory",
     };
   }

@@ -185,6 +185,8 @@ async function setupMirixConfig(
     apiKey?: string;
     baseUrl?: string;
     searchToolName?: string;
+    userIdMode?: string;
+    userIdPrefix?: string;
   } = {},
 ): Promise<{
   configPath: string;
@@ -212,6 +214,20 @@ async function setupMirixConfig(
     const searchToolName =
       searchToolInput === "search_memory" ? "search_memory" : "search_mirix_memory";
 
+    const userIdModeInput = pickConfiguredOrDefault(
+      options.userIdMode,
+      current.userIdMode || "agent",
+    );
+    const userIdMode =
+      userIdModeInput === "session" || userIdModeInput === "fixed" || userIdModeInput === "agent"
+        ? userIdModeInput
+        : "agent";
+
+    const userIdPrefix = pickConfiguredOrDefault(
+      options.userIdPrefix,
+      current.userIdPrefix || "openclaw",
+    );
+
     const configPatch: Parameters<typeof scheduleOpenClawConfigWrite>[0] = {
       apiKey,
       baseUrl: baseUrl || current.baseUrl || "https://api.mirix.io",
@@ -222,8 +238,8 @@ async function setupMirixConfig(
       recallLimit: current.recallLimit || 6,
       searchMethod: current.searchMethod || "embedding",
       searchToolName,
-      userIdMode: current.userIdMode || "session",
-      userIdPrefix: current.userIdPrefix || "openclaw",
+      userIdMode,
+      userIdPrefix,
     };
 
     scheduleOpenClawConfigWrite(configPatch);
@@ -297,6 +313,11 @@ export default {
           .description("Prompt for the Mirix API key and write OpenClaw config")
           .option("--api-key <apiKey>", "Mirix API key")
           .option("--base-url <baseUrl>", "Mirix API URL")
+          .option(
+            "--user-id-mode <userIdMode>",
+            "Mirix user id mode: agent, session, or fixed",
+          )
+          .option("--user-id-prefix <userIdPrefix>", "Prefix used when deriving Mirix user ids")
           .option(
             "--search-tool-name <searchToolName>",
             "Detailed search tool name: search_mirix_memory or search_memory",

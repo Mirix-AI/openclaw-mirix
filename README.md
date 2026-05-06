@@ -47,14 +47,14 @@ openclaw plugins install @mirix-ai/openclaw-mirix
 openclaw mirix setup
 ```
 
-`openclaw mirix setup` only prompts for the Mirix API key. It uses the default API URL `https://api.mirix.io` and the default detailed search tool name `search_mirix_memory` unless you override them with CLI flags.
+`openclaw mirix setup` only prompts for the Mirix API key. It uses the default API URL `https://api.mirix.io`, the default detailed search tool name `search_mirix_memory`, and the default `userIdMode` of `agent` unless you override them with CLI flags.
 
 The `setup` command prompts for the Mirix API key and writes the plugin config into `~/.openclaw/openclaw.json`.
 
 It also supports non-interactive flags:
 
 ```bash
-openclaw mirix setup --api-key YOUR_MIRIX_API_KEY --search-tool-name search_mirix_memory
+openclaw mirix setup --api-key YOUR_MIRIX_API_KEY --search-tool-name search_mirix_memory --user-id-mode agent --user-id-prefix openclaw
 ```
 
 3. If you want it listed on the OpenClaw community plugins page, add:
@@ -87,7 +87,7 @@ Add this to your OpenClaw config:
           "recallLimit": 6,
           "searchMethod": "embedding",
           "searchToolName": "search_mirix_memory",
-          "userIdMode": "session",
+          "userIdMode": "agent",
           "userIdPrefix": "openclaw"
         }
       }
@@ -100,11 +100,11 @@ Add this to your OpenClaw config:
 
 The plugin derives `user_id` for Mirix from OpenClaw runtime state.
 
-- `session` mode: `openclaw:<agentId>:<sessionKey>`
 - `agent` mode: `openclaw:<agentId>`
+- `session` mode: `openclaw:<agentId>:<sessionKey>`
 - `fixed` mode: uses `fixedUserId`
 
-`session` is the safest default because it keeps memory scoped per OpenClaw session.
+`agent` is the default because it keeps memory shared across sessions for the same OpenClaw agent.
 
 ## Manual tool usage
 
